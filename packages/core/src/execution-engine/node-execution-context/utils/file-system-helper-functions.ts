@@ -2,9 +2,8 @@ import { isContainedWithin, safeJoinPath } from '@n8n/backend-common';
 import { Container } from '@n8n/di';
 import type { FileSystemHelperFunctions, INode } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
-import { createReadStream } from 'node:fs';
+import { createReadStream, realpathSync } from 'node:fs';
 import { access as fsAccess, writeFile as fsWriteFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
 
 import {
 	BINARY_DATA_STORAGE_PATH,
@@ -31,7 +30,7 @@ const getAllowedPaths = () => {
 
 export function isFilePathBlocked(filePath: string): boolean {
 	const allowedPaths = getAllowedPaths();
-	const resolvedFilePath = resolve(filePath);
+	const resolvedFilePath = realpathSync(filePath);
 	const blockFileAccessToN8nFiles = process.env[BLOCK_FILE_ACCESS_TO_N8N_FILES] !== 'false';
 
 	const restrictedPaths = blockFileAccessToN8nFiles ? getN8nRestrictedPaths() : [];
